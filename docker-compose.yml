@@ -1,20 +1,31 @@
 version: '2'
 services:
-  bookstack:
-    image: kilhog/bookstack
-    depends_on:
-      - db
-    environment:
-    - DB_HOST=db
-    - DB_DATABASE=bookstack
-    - DB_USERNAME=bookstack
-    - DB_PASSWORD=secret
-    ports:
-    - "8080:80"
-  db:
-    image: mysql:5.7.12
+  mysql:
+    image: mysql:5.7.21
     environment:
     - MYSQL_ROOT_PASSWORD=secret
     - MYSQL_DATABASE=bookstack
     - MYSQL_USER=bookstack
     - MYSQL_PASSWORD=secret
+    volumes:
+    - mysql-data:/var/lib/mysql
+
+  bookstack:
+    image: solidnerd/bookstack:latest
+    depends_on:
+    - mysql
+    environment:
+    - DB_HOST=mysql
+    - DB_DATABASE=bookstack
+    - DB_USERNAME=bookstack
+    - DB_PASSWORD=secret
+    volumes:
+    - uploads:/var/www/bookstack/public/uploads
+    - storage-uploads:/var/www/bookstack/public/storage
+    ports:
+    - "80:80"
+
+volumes:
+ mysql-data:
+ uploads:
+ storage-uploads:
